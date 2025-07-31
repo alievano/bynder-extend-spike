@@ -106,7 +106,7 @@ type Config = Readonly<{
 const openBynderPicker = (config: Config, onSuccess: (assets: ReadonlyArray<BynderImage>) => void) => {
   BynderCompactView.open({
     portal: config.bynderUrl ? { url: config.bynderUrl } : undefined,
-    mode: "MultiSelect",
+    mode: "SingleSelect",
     assetTypes: ["image"],
     onSuccess,
   });
