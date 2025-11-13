@@ -4,6 +4,7 @@ import { AssetsPickerButton } from "./AssetsPickerButton";
 import { PoweredByLogo } from "./PoweredByLogo";
 import { SelectedImages } from "./SelectedImages";
 import { BynderElementImage } from "./types/bynderImage";
+import { useImageEditModal } from "./useImageEditModal";
 
 const defaultPreviewDerivative = "thumbnail";
 const defaultWebDerivative = "webImage";
@@ -14,6 +15,7 @@ export const BynderImageSelector: FC = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [config, setConfig] = useState<null | Config>(null);
   const [fixedSize, setFixedSize] = useState<number | null>(null);
+  const { showModal, modal } = useImageEditModal();
 
   const updateSize = useCallback((providedSize?: number) => {
     const newSize = providedSize ?? Math.max(document.documentElement.offsetHeight, 100);
@@ -74,7 +76,16 @@ export const BynderImageSelector: FC = () => {
       return;
     }
     updateSize(800);
-    openBynderPicker(config, assets => updateValue(assets.map(convertBynderImage(config))));
+    openBynderPicker(config, assets => {
+      if (!assets.length) return;
+      // Only allow one image (SingleSelect mode)
+      const newImage = convertBynderImage(config)(assets[0]);
+      showModal(newImage, (editedImage) => {
+        // Add the edited image to the list (replace if already exists)
+        const newValue = [...currentValue.filter(img => img.id !== editedImage.id), editedImage];
+        updateValue(newValue);
+      });
+    });
   };
 
   return (
@@ -90,13 +101,11 @@ export const BynderImageSelector: FC = () => {
         isDisabled={isDisabled}
         removeImage={removeImage}
       />
+      {modal}
       <PoweredByLogo />
     </>
   );
 };
-
-BynderImageSelector.displayName = "BynderImageSelector";
-
 type Config = Readonly<{
   bynderUrl?: string;
   previewDerivative?: string;
@@ -111,6 +120,7 @@ const openBynderPicker = (config: Config, onSuccess: (assets: ReadonlyArray<Bynd
     onSuccess,
   });
 };
+
 
 const convertBynderImage = (config: Config) => (asset: BynderImage): BynderElementImage => ({
   id: asset.id,

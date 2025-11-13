@@ -48,23 +48,60 @@ export const SelectedImages: FC<Props> = props => (
 
 SelectedImages.displayName = "SelectedImages";
 
-const renderImage = (image: BynderElementImage) =>
-  image.previewUrl
-    ? (
-      <a
-        href={image.bynderUrl}
-        target="_blank"
-        rel="noreferrer"
-      >
+const renderImage = (image: BynderElementImage) => {
+  if (!image.previewUrl) {
+    return <div className="noimage">No image available</div>;
+  }
+
+  // Crop preview logic
+  let style: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'cover' };
+  let wrapperStyle: React.CSSProperties = { width: 120, height: 68, overflow: 'hidden', position: 'relative', display: 'inline-block', background: '#eee' };
+  if (image.crop) {
+    // Calculate crop as percent
+    const { x, y, width, height, unit } = image.crop;
+    if (unit === '%') {
+      style = {
+        ...style,
+        objectPosition: `${50 - x - width / 2}% ${50 - y - height / 2}%`,
+        width: `${100 / (width / 100)}%`,
+        height: `${100 / (height / 100)}%`,
+      };
+      wrapperStyle = {
+        ...wrapperStyle,
+        aspectRatio: `${width}/${height}`,
+      };
+    }
+    // px support could be added if needed
+  }
+
+  return (
+    <a
+      href={image.bynderUrl}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div style={wrapperStyle}>
         <img
           className="asset-thumbnail__image"
           src={image.previewUrl}
           alt={image.description}
+          style={style}
         />
-      </a>
-    )
-    : (
-      <div className="noimage">
-        No image available
+        {image.focalPoint && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${image.focalPoint.x * 100}%`,
+              top: `${image.focalPoint.y * 100}%`,
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          >
+            <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'red', border: '2px solid #fff' }} />
+          </div>
+        )}
       </div>
-    );
+    </a>
+  );
+};
