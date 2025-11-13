@@ -19,12 +19,11 @@ export function useImageEditModal(): UseImageEditModalResult {
     setModalState({ image, onSave });
   };
 
-  const handleSave = (crop: Crop, focalPoint: { x: number; y: number }) => {
+  const handleSave = (crop: Crop) => {
     if (!modalState) return;
     const updated: BynderElementImage = {
       ...modalState.image,
       crop: { ...crop },
-      focalPoint,
     };
     modalState.onSave(updated);
     setModalState(null);
@@ -36,7 +35,6 @@ export function useImageEditModal(): UseImageEditModalResult {
     <ImageEditModal
       imageUrl={modalState.image.previewUrl || modalState.image.bynderUrl}
       initialCrop={modalState.image.crop}
-      initialFocalPoint={modalState.image.focalPoint}
       onSave={handleSave}
       onClose={handleClose}
     />

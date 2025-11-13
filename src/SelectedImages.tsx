@@ -87,20 +87,6 @@ const renderImage = (image: BynderElementImage) => {
           alt={image.description}
           style={style}
         />
-        {image.focalPoint && (
-          <div
-            style={{
-              position: 'absolute',
-              left: `${image.focalPoint.x * 100}%`,
-              top: `${image.focalPoint.y * 100}%`,
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'none',
-              zIndex: 2,
-            }}
-          >
-            <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'red', border: '2px solid #fff' }} />
-          </div>
-        )}
       </div>
     </a>
   );
