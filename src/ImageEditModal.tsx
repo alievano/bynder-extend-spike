@@ -1,7 +1,7 @@
 import 'react-image-crop/dist/ReactCrop.css';
 
 import React, { useRef,useState } from 'react';
-import ReactCrop, { Crop } from 'react-image-crop';
+import { Crop,ReactCrop } from 'react-image-crop';
 
 
 interface ImageEditModalProps {
